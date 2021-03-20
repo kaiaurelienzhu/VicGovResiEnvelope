@@ -16,16 +16,6 @@ namespace VicGovResiEnvelope
         /// <returns>A VicGovResiEnvelopeOutputs instance containing computed results and the model with any new elements.</returns>
         public static VicGovResiEnvelopeOutputs Execute(Dictionary<string, Model> inputModels, VicGovResiEnvelopeInputs input)
         {
-            // Retrieve site information from incoming models
-            var sites = new List<Site>();
-            inputModels.TryGetValue("Site", out var model);
-            if (model == null)
-            {
-              throw new ArgumentException("No Site found.");
-            }
-            sites.AddRange(model.AllElementsOfType<Site>());
-            sites = sites.OrderByDescending(e => e.Perimeter.Area()).ToList();
-            
             // Get site model dependency
             var siteModel = inputModels["Site"];
             var siteElement = siteModel.AllElementsOfType<Site>().First();

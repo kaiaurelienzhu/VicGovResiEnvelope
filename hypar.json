@@ -24,21 +24,6 @@
         "$hyparUnitType": "length",
         "$hyparOrder": 0,
         "minimum": 0
-      },
-      "Lot Boundaries": {
-        "default": [
-          null,
-          null
-        ],
-        "type": "array",
-        "$hyparOrder": 1,
-        "items": {
-          "name": "User Defined Lot Boundaries",
-          "description": "Lot boundary definitions defined by closest point",
-          "default": null,
-          "type": "object",
-          "$ref": "https://hypar.io/Schemas/Geometry/Vector3.json"
-        }
       }
     }
   },
