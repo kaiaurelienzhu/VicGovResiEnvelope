@@ -25,13 +25,19 @@ namespace VicGovResiEnvelope
             }
             sites.AddRange(model.AllElementsOfType<Site>());
             sites = sites.OrderByDescending(e => e.Perimeter.Area()).ToList();
-            var output = new VicGovResiEnvelopeOutputs();
-
+            
+            // Get site model dependency
             var siteModel = inputModels["Site"];
             var siteElement = siteModel.AllElementsOfType<Site>().First();
             var perimeter = siteElement.Perimeter.Offset(-input.Setback);
+            var profile = new Profile(perimeter);
+            var mass =  new Mass(profile, 10);
             var modelCurves = perimeter.Select(p => new ModelCurve(p));
+
+            // Generate outputs
+            var output = new VicGovResiEnvelopeOutputs();
             output.Model.AddElements(modelCurves);
+            output.Model.AddElements(mass);
             return output;
         }
       }

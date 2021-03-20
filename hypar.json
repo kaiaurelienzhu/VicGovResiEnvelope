@@ -2,7 +2,7 @@
   "$schema": "https://hypar.io/Schemas/Function.json",
   "id": "0e1fbd80-e049-473e-be3a-821f140c246e",
   "name": "VicGov Resi Envelope",
-  "description": "",
+  "description": "This function attempts to automate the Victorian Government (AUS) residential planning envelope",
   "language": "C#",
   "model_dependencies": [
     {
@@ -24,6 +24,21 @@
         "$hyparUnitType": "length",
         "$hyparOrder": 0,
         "minimum": 0
+      },
+      "Lot Boundaries": {
+        "default": [
+          null,
+          null
+        ],
+        "type": "array",
+        "$hyparOrder": 1,
+        "items": {
+          "name": "User Defined Lot Boundaries",
+          "description": "Lot boundary definitions defined by closest point",
+          "default": null,
+          "type": "object",
+          "$ref": "https://hypar.io/Schemas/Geometry/Vector3.json"
+        }
       }
     }
   },
@@ -32,7 +47,7 @@
     "https://raw.githubusercontent.com/hypar-io/Schemas/master/Site.json",
     "https://prod-api.hypar.io/schemas/Envelope"
   ],
-  "repository_url": "",
+  "repository_url": "https://github.com/kaiaurelienzhu/VicGovResiEnvelope",
   "source_file_key": null,
   "preview_image": null
 }

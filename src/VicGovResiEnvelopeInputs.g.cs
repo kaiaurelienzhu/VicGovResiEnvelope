@@ -28,16 +28,17 @@ namespace VicGovResiEnvelope
     {
         [Newtonsoft.Json.JsonConstructor]
         
-        public VicGovResiEnvelopeInputs(double @setback, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
+        public VicGovResiEnvelopeInputs(double @setback, IList<Vector3> @lotBoundaries, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
         base(bucketName, uploadsBucket, modelInputKeys, gltfKey, elementsKey, ifcKey)
         {
             var validator = Validator.Instance.GetFirstValidatorForType<VicGovResiEnvelopeInputs>();
             if(validator != null)
             {
-                validator.PreConstruct(new object[]{ @setback});
+                validator.PreConstruct(new object[]{ @setback, @lotBoundaries});
             }
         
             this.Setback = @setback;
+            this.LotBoundaries = @lotBoundaries;
         
             if(validator != null)
             {
@@ -49,6 +50,9 @@ namespace VicGovResiEnvelope
         [Newtonsoft.Json.JsonProperty("Setback", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Range(0D, 15D)]
         public double Setback { get; set; } = 0D;
+    
+        [Newtonsoft.Json.JsonProperty("Lot Boundaries", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public IList<Vector3> LotBoundaries { get; set; }
     
     
     }
