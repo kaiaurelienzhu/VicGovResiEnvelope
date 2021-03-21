@@ -25,15 +25,22 @@ namespace VicGovResiEnvelope
             List<Line> lotBoundarySegments = profile.Segments();
             List<Vector3> midPoints = lotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
             
-            // Get plot centreline TO DO: Sort by segment lengths
+            // Get front lot boundary from UI
+            Vector3 frontLotClosestPt = Vector3.Origin; // Override with UI
+            
+
+
+
+            // Get back lot boundary edge & calculate centreline      
             var centreLine = new Line(midPoints[0], midPoints[2]);
             var modelLine = new ModelCurve(centreLine);
 
             var mass =  new Mass(profile, 10);
             var modelCurves = perimeter.Select(i => new ModelCurve(i));
 
+            // Select 
 
-            // Generate outputs
+            // Outputs
             var output = new VicGovResiEnvelopeOutputs();
             output.Model.AddElements(modelCurves);
             output.Model.AddElement(modelLine);
