@@ -70,7 +70,7 @@ namespace VicGovResiEnvelope
             // Create envelope 
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var mat = new Material("Red", Colors.Red);
-            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
+            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { });
             var fndMatl = new Material("foundation", new Color(0.6, 0.60000002384185791, 0.6, 1), 0.0f, 0.0f);
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
@@ -85,8 +85,8 @@ namespace VicGovResiEnvelope
 
 
             // Create planning envelope
-            var mass =  new Mass(siteBoundaryProfile, input.ProposedBuildingHeights);
-            output.Model.AddElements(mass);
+            // var mass =  new Mass(siteBoundaryProfile, input.ProposedBuildingHeights);
+            // output.Model.AddElements(mass);
 
             // Outputs
             output.Model.AddElement(centreModelLine);
