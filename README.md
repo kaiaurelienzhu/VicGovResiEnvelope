@@ -6,12 +6,12 @@ This function attempts to automate the Victorian Government (AUS) residential pl
 
 |Input Name|Type|Description|
 |---|---|---|
-|Proposed Building Height|number||
+|Proposed Building Heights|number||
 
 
 <br>
 
 |Output Name|Type|Description|
 |---|---|---|
-|Setback|Number|The required setback from boundary defined by the proposed building height|
+|Required Setback|Number|The required setback from boundary derived from the proposed building height|
 

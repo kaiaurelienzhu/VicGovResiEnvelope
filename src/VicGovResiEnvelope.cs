@@ -19,20 +19,15 @@ namespace VicGovResiEnvelope
         public static VicGovResiEnvelopeOutputs Execute(Dictionary<string, Model> inputModels, VicGovResiEnvelopeInputs input)
         {
 
-            // Default Values
-            // var maxBuildingHeight = 11.0;
-
-
             // Get site model dependency
             var siteModel = inputModels["Site"];
             var siteElement = siteModel.AllElementsOfType<Site>().First();
-            double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeight);
+
+            // Get Setback
+            double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeights);
             var output = new VicGovResiEnvelopeOutputs(setback);
 
-
-
-
-            // Get boundary & sort
+            // Boundary & sort
             var perimeter = siteElement.Perimeter.Offset(setback * -1);
             var siteArea = siteElement.Area;
             var siteBoundaryProfile = new Profile(perimeter);
@@ -49,14 +44,13 @@ namespace VicGovResiEnvelope
 
             var distToCentre = 0;
 
-
-            // Orient to lot
+            // Get lot details
             var frontBoundary = sortedLotBoundarySegments.First();
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
             var sideBoundary = sortedLotBoundarySegments.ElementAt(2);
 
-            // Side and rear setback envelope at origin
+            // Draw side and rear setback envelope at origin
             List<Vector3> envelopePtList = new List<Vector3>();
             envelopePtList.Add(Vector3.Origin);
             envelopePtList.Add(new Vector3(0, 3.6, 0));
@@ -70,16 +64,12 @@ namespace VicGovResiEnvelope
             Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
             poly.Transform(transform);  
 
-            // Create envelope  
+            // Create envelope output
             var envelopeProfile = new Profile(poly);
             var mat = new Material("Red", Colors.Red);
             var geomRep = new Representation(new List<SolidOperation>() );
-            var envelope = new Envelope(envelopeProfile, 0, 11, Vector3.ZAxis, 0.0, new Transform(0, 0, 0), mat, geomRep, false, Guid.NewGuid(), "");
-            output.Model.AddElement(envelope);
-
-
-
-
+            // var envelope = new Envelope(envelopeProfile, 0, 11, Vector3.ZAxis, 0.0, new Transform(0, 0, 0), mat, geomRep, false, Guid.NewGuid(), "");
+            // output.Model.AddElement(envelope);
             var sideRearSetbackModelCurves = poly.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(sideRearSetbackModelCurves);
             var modelCurves = perimeter.Select(i => new ModelCurve(i));
@@ -88,7 +78,7 @@ namespace VicGovResiEnvelope
 
             // Create planning envelope
             var mass =  new Mass(siteBoundaryProfile, 11);
-            // output.Model.AddElements(mass);
+            output.Model.AddElements(mass);
 
             // Outputs
             output.Model.AddElement(centreModelLine);
@@ -96,18 +86,20 @@ namespace VicGovResiEnvelope
             return output;
         }
 
+
+        // Table 1 - Side and rear boundary setbacks table
         public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
         {
           if (proposedBuildingHeight < 6.9)
-          {
-            return 1;
+          { 
+            return ((proposedBuildingHeight - 3.6) * 0.3) + 1.0;
           }
 
           else if (proposedBuildingHeight >= 6.9)
           {
-            return 2;
+            return ((proposedBuildingHeight - 6.9) * 1.0) + 2.0;
           }
-
+          // Default output
           return 1;
         }
       }

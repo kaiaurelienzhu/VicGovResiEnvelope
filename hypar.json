@@ -15,7 +15,7 @@
   "input_schema": {
     "type": "object",
     "properties": {
-      "Proposed Building Height": {
+      "Proposed Building Heights": {
         "multipleOf": 0.1,
         "default": 3.6,
         "maximum": 11,
@@ -29,8 +29,8 @@
   "outputs": [
     {
       "unit_type": "length",
-      "name": "Setback",
-      "description": "The required setback from boundary defined by the proposed building height",
+      "name": "Required Setback",
+      "description": "The required setback from boundary derived from the proposed building height",
       "type": "number"
     }
   ],
