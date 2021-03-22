@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Linq.Dynamic;
+using System.Collections;
 
 namespace VicGovResiEnvelope
 {
@@ -34,17 +35,15 @@ namespace VicGovResiEnvelope
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
             var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.Length());
             List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
-            
-            
-            Vector3 frontLotClosestPt = Vector3.Origin; // Override with UI
-
-            // Calculate centreline      
-            var centreLine = new Line(midPoints[0], midPoints[1]);
-            var centreModelLine = new ModelCurve(centreLine);
+          
+            // Calculate lot centreline      
+            var lotCentreLine = new Line(midPoints[0], midPoints[1]);
+            var centreModelLine = new ModelCurve(lotCentreLine);
 
             var distToCentre = 0;
 
-            // Get lot details
+            // Get lot data 
+            Vector3 frontLotClosestPt = Vector3.Origin; // Override with UI
             var frontBoundary = sortedLotBoundarySegments.First();
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
@@ -60,24 +59,33 @@ namespace VicGovResiEnvelope
             envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + distToCentre, 10));
             envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + distToCentre, 0));
 
-            var poly = new Polygon(envelopePtList);
-            Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
-            poly.Transform(transform);  
+            // Mirror envelope 
 
-            // Create envelope output
-            var envelopeProfile = new Profile(poly);
+
+            // Transform to lot
+            var planningEnvelopePolgyon = new Polygon(envelopePtList);
+            Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
+            //planningEnvelopePolgyon.Transform(transform);  
+
+            // Create envelope 
+            var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var mat = new Material("Red", Colors.Red);
-            var geomRep = new Representation(new List<SolidOperation>() );
-            // var envelope = new Envelope(envelopeProfile, 0, 11, Vector3.ZAxis, 0.0, new Transform(0, 0, 0), mat, geomRep, false, Guid.NewGuid(), "");
-            // output.Model.AddElement(envelope);
-            var sideRearSetbackModelCurves = poly.Segments().Select(i => new ModelCurve(i));
+            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
+            var fndMatl = new Material("foundation", new Color(0.6, 0.60000002384185791, 0.6, 1), 0.0f, 0.0f);
+            var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
+            var envelopes = new List<Envelope>()
+            {
+              new Envelope(envelopeProfile, 0, 20, Vector3.ZAxis, 0.0, new Transform(0,0,0), fndMatl, geomRep, false, Guid.NewGuid(),"")
+            };
+            output.Model.AddElements(envelopes);
+            var sideRearSetbackModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(sideRearSetbackModelCurves);
             var modelCurves = perimeter.Select(i => new ModelCurve(i));
             output.Model.AddElements(modelCurves);
 
 
             // Create planning envelope
-            var mass =  new Mass(siteBoundaryProfile, 11);
+            var mass =  new Mass(siteBoundaryProfile, input.ProposedBuildingHeights);
             output.Model.AddElements(mass);
 
             // Outputs
