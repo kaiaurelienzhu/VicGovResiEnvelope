@@ -15,15 +15,14 @@
   "input_schema": {
     "type": "object",
     "properties": {
-      "Setback": {
-        "multipleOf": 1,
-        "default": 0,
-        "maximum": 15,
-        "description": "The setback",
+      "Proposed Building Height": {
+        "multipleOf": 0.1,
+        "default": 3.6,
+        "maximum": 11,
         "type": "number",
         "$hyparUnitType": "length",
         "$hyparOrder": 0,
-        "minimum": 0
+        "minimum": 3.6
       }
     }
   },

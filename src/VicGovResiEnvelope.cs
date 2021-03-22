@@ -18,19 +18,22 @@ namespace VicGovResiEnvelope
         /// <returns>A VicGovResiEnvelopeOutputs instance containing computed results and the model with any new elements.</returns>
         public static VicGovResiEnvelopeOutputs Execute(Dictionary<string, Model> inputModels, VicGovResiEnvelopeInputs input)
         {
-            var output = new VicGovResiEnvelopeOutputs();
+
             // Default Values
             // var maxBuildingHeight = 11.0;
-
 
 
             // Get site model dependency
             var siteModel = inputModels["Site"];
             var siteElement = siteModel.AllElementsOfType<Site>().First();
+            double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeight);
+            var output = new VicGovResiEnvelopeOutputs(setback);
+
+
 
 
             // Get boundary & sort
-            var perimeter = siteElement.Perimeter.Offset(-input.Setback);
+            var perimeter = siteElement.Perimeter.Offset(setback * -1);
             var siteArea = siteElement.Area;
             var siteBoundaryProfile = new Profile(perimeter);
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
@@ -76,6 +79,7 @@ namespace VicGovResiEnvelope
 
 
 
+
             var sideRearSetbackModelCurves = poly.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(sideRearSetbackModelCurves);
             var modelCurves = perimeter.Select(i => new ModelCurve(i));
@@ -90,6 +94,21 @@ namespace VicGovResiEnvelope
             output.Model.AddElement(centreModelLine);
 
             return output;
+        }
+
+        public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
+        {
+          if (proposedBuildingHeight < 6.9)
+          {
+            return 1;
+          }
+
+          else if (proposedBuildingHeight >= 6.9)
+          {
+            return 2;
+          }
+
+          return 1;
         }
       }
 }

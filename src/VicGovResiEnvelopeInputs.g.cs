@@ -28,16 +28,16 @@ namespace VicGovResiEnvelope
     {
         [Newtonsoft.Json.JsonConstructor]
         
-        public VicGovResiEnvelopeInputs(double @setback, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
+        public VicGovResiEnvelopeInputs(double @proposedBuildingHeight, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
         base(bucketName, uploadsBucket, modelInputKeys, gltfKey, elementsKey, ifcKey)
         {
             var validator = Validator.Instance.GetFirstValidatorForType<VicGovResiEnvelopeInputs>();
             if(validator != null)
             {
-                validator.PreConstruct(new object[]{ @setback});
+                validator.PreConstruct(new object[]{ @proposedBuildingHeight});
             }
         
-            this.Setback = @setback;
+            this.ProposedBuildingHeight = @proposedBuildingHeight;
         
             if(validator != null)
             {
@@ -45,10 +45,9 @@ namespace VicGovResiEnvelope
             }
         }
     
-        /// <summary>The setback</summary>
-        [Newtonsoft.Json.JsonProperty("Setback", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        [System.ComponentModel.DataAnnotations.Range(0D, 15D)]
-        public double Setback { get; set; } = 0D;
+        [Newtonsoft.Json.JsonProperty("Proposed Building Height", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        [System.ComponentModel.DataAnnotations.Range(3.6D, 11D)]
+        public double ProposedBuildingHeight { get; set; } = 3.6D;
     
     
     }
