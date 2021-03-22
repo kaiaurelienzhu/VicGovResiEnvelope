@@ -5,7 +5,6 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Linq.Dynamic;
-using System.Collections;
 
 namespace VicGovResiEnvelope
 {
@@ -69,8 +68,9 @@ namespace VicGovResiEnvelope
 
             // Create envelope 
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
+            var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, setback, Vector3.ZAxis, false);
             var mat = new Material("Red", Colors.Red);
-            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { });
+            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
             var fndMatl = new Material("foundation", new Color(0.6, 0.60000002384185791, 0.6, 1), 0.0f, 0.0f);
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
