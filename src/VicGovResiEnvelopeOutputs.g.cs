@@ -16,6 +16,12 @@ namespace VicGovResiEnvelope
 {
     public class VicGovResiEnvelopeOutputs: ResultsBase
     {
+		/// <summary>
+		/// The required setback from boundary defined by the proposed building height
+		/// </summary>
+		[JsonProperty("Setback")]
+		public double Setback {get;}
+
 
 
         /// <summary>
@@ -28,5 +34,21 @@ namespace VicGovResiEnvelope
         }
 
 
+        /// <summary>
+        /// Construct a VicGovResiEnvelopeOutputs specifying all inputs.
+        /// </summary>
+        /// <returns></returns>
+        [JsonConstructor]
+        public VicGovResiEnvelopeOutputs(double setback): base()
+        {
+			this.Setback = setback;
+
+		}
+
+		public override string ToString()
+		{
+			var json = JsonConvert.SerializeObject(this);
+			return json;
+		}
 	}
 }

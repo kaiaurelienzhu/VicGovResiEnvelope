@@ -27,7 +27,14 @@
       }
     }
   },
-  "outputs": [],
+  "outputs": [
+    {
+      "unit_type": "length",
+      "name": "Setback",
+      "description": "The required setback from boundary defined by the proposed building height",
+      "type": "number"
+    }
+  ],
   "element_types": [
     "https://raw.githubusercontent.com/hypar-io/Schemas/master/Site.json",
     "https://prod-api.hypar.io/schemas/Envelope"
