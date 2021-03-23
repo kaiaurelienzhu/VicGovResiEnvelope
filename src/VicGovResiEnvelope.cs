@@ -33,15 +33,15 @@ namespace VicGovResiEnvelope
             var siteBoundaryProfile = new Profile(perimeter);
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
             var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.Length());
-
             List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
+
+            // Create lotBoundary as Curve object
+            var lotBoundaryCurveLoop = GetPolylineFromSegments(lotBoundarySegments);
+
             
-          
             // Calculate lot centreline      
             var lotCentreLine = new Line(midPoints[0], midPoints[1]);
             var centreModelLine = new ModelCurve(lotCentreLine);
-
-            var distToCentre = 0;
 
             // Get lot data 
             Vector3 frontLotClosestPt = Vector3.Origin; // Override with UI
@@ -51,27 +51,28 @@ namespace VicGovResiEnvelope
             var sideBoundary = sortedLotBoundarySegments.ElementAt(2);
 
             // Draw side and rear setback envelope at origin
+            double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
+            double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
+
+
             List<Vector3> envelopePtList = new List<Vector3>();
             envelopePtList.Add(Vector3.Origin);
-            envelopePtList.Add(new Vector3(0, 3.6, 0));
-            envelopePtList.Add(new Vector3(1, 3.6, 0));
-            envelopePtList.Add(new Vector3(2, 6.9, 0));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 10));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + distToCentre, 10));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + distToCentre, 0));
-
-            // Mirror envelope 
-
+            envelopePtList.Add(new Vector3(0, 3.6));
+            envelopePtList.Add(new Vector3(1, 3.6));
+            envelopePtList.Add(new Vector3(2, 6.9));
+            envelopePtList.Add(new Vector3(thirdStoreyXcoordinate + 2, maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + thirdStoreyXcoordinate, maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + thirdStoreyXcoordinate, 0.0));
 
             // Transform to lot
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
-            Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
+            //Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
             //planningEnvelopePolgyon.Transform(transform);  
 
             // Create envelope 
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, setback, Vector3.ZAxis, false);
-            var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotCentreLine, 0, 0, 0, false);
+            var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 0, 0, 0, false);
             var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
             var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { sweep });
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
@@ -111,6 +112,38 @@ namespace VicGovResiEnvelope
           }
           // Default output
           return 1;
+        }
+        public static double GetMaxHeightAllowance(double proposedBuildingHeight)
+        {
+          if (proposedBuildingHeight > 10.0)
+          {
+            return (11.0);
+          }
+          // Default output
+          return 10.0;
+        }
+        public static double GetThirdStoreyXcoordinate(double maxHeightAllowance)
+        {
+          if (maxHeightAllowance == 10.0)
+          {
+            return 3.1;
+          }
+          else if (maxHeightAllowance == 11.0)
+          {
+            return 4.1;
+          }
+          // Default output
+          return 3.1;
+        }
+        public static Polyline GetPolylineFromSegments(IList<Line> lineSegments)
+        {
+          List<Vector3> points = new List<Vector3>();
+          foreach (Line seg in lineSegments)
+          {
+            points.Add(seg.PointAt(0.0));
+            points.Add(lineSegments.First().PointAt(0.0));
+          }
+          return new Polyline(points);
         }
       }
 }
