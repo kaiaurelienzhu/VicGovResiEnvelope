@@ -55,20 +55,22 @@ namespace VicGovResiEnvelope
             double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
             List<Vector3> envelopePtList = new List<Vector3>();
             envelopePtList.Add(Vector3.Origin);
-            envelopePtList.Add(new Vector3(0, 3.6));
-            envelopePtList.Add(new Vector3(1, 3.6));
-            envelopePtList.Add(new Vector3(2, 6.9));
-            envelopePtList.Add(new Vector3(thirdStoreyXcoordinate + 2, maxHeight));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + thirdStoreyXcoordinate, maxHeight));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved + thirdStoreyXcoordinate, 0.0));
+            envelopePtList.Add(new Vector3(0*-1, 3.6));
+            envelopePtList.Add(new Vector3(1*-1, 3.6));
+            envelopePtList.Add(new Vector3(2*-1, 6.9));
+            envelopePtList.Add(new Vector3((thirdStoreyXcoordinate + 2)*-1, maxHeight));
+            envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, maxHeight));
+            envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, 0.0));
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
-            //Transform transform = new Transform(frontBoundary.Start, frontBoundary.Direction(), sideBoundary.Direction().Negate(), 0);
-            //planningEnvelopePolgyon.Transform(transform);  
+            var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+            output.Model.AddElements(planningEnvelopeModelCurves);
+
 
             // Create envelope 
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
+
             var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, setback, Vector3.ZAxis, false);
-            var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 5, 5, 0, false);
+            var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 0, 0, 0, false);
             var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
             var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { sweep });
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
