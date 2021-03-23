@@ -33,7 +33,9 @@ namespace VicGovResiEnvelope
             var siteBoundaryProfile = new Profile(perimeter);
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
             var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.Length());
+
             List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
+            
           
             // Calculate lot centreline      
             var lotCentreLine = new Line(midPoints[0], midPoints[1]);
@@ -69,13 +71,13 @@ namespace VicGovResiEnvelope
             // Create envelope 
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, setback, Vector3.ZAxis, false);
-            var mat = new Material("Red", Colors.Red);
+            var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotCentreLine, 0, 0, 0, false);
             var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
-            var fndMatl = new Material("foundation", new Color(0.6, 0.60000002384185791, 0.6, 1), 0.0f, 0.0f);
+            var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { sweep });
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
             {
-              new Envelope(envelopeProfile, 0, 20, Vector3.ZAxis, 0.0, new Transform(0,0,0), fndMatl, geomRep, false, Guid.NewGuid(),"")
+              new Envelope(envelopeProfile, 0, 50, Vector3.ZAxis, 0.0, new Transform(0,0,0), envMatl, geomRep2, false, Guid.NewGuid(),"")
             };
             output.Model.AddElements(envelopes);
             var sideRearSetbackModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
