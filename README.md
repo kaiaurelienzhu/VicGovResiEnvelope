@@ -6,6 +6,7 @@ This function attempts to automate the Victorian Government (AUS) residential pl
 
 |Input Name|Type|Description|
 |---|---|---|
+|Front Boundary|https://hypar.io/Schemas/Geometry/Vector3.json|A point which will be used to select the nearest boundary edge|
 |Proposed Building Heights|number||
 
 

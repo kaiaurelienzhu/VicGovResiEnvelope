@@ -15,6 +15,13 @@
   "input_schema": {
     "type": "object",
     "properties": {
+      "Front Boundary": {
+        "description": "A point which will be used to select the nearest boundary edge",
+        "default": null,
+        "type": "object",
+        "$hyparOrder": 1,
+        "$ref": "https://hypar.io/Schemas/Geometry/Vector3.json"
+      },
       "Proposed Building Heights": {
         "multipleOf": 0.1,
         "default": 3.6,
