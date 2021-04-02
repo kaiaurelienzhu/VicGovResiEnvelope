@@ -32,25 +32,30 @@ namespace VicGovResiEnvelope
             var siteArea = siteElement.Area;
             var siteBoundaryProfile = new Profile(perimeter);
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
-            var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.Length());
-            List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
 
             // Create lotBoundary as Curve object
             var lotBoundaryCurveLoop = GetPolylineFromSegments(lotBoundarySegments);
 
-            
-            // Calculate lot centreline      
-            var lotCentreLine = new Line(midPoints[0], midPoints[1]);
-            var centreModelLine = new ModelCurve(lotCentreLine);
-
-            // Get lot data 
+            // Get front lot edge and render to Hypar
             Vector3 frontLotClosestPt = input.FrontBoundary; // Override with UI
-            var frontBoundary = sortedLotBoundarySegments.OrderBy(s => s.PointAt(0.5).CompareTo(frontLotClosestPt)).First();
+            var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.PointAt(0.5).DistanceTo(frontLotClosestPt));
+            List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
+            var frontBoundary = sortedLotBoundarySegments.First();
+            var sideBoundary1 = sortedLotBoundarySegments.ElementAt(1);
+            var sideBoundary2 = sortedLotBoundarySegments.ElementAt(2);
+            var backBoundary = sortedLotBoundarySegments.Last();
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
             var sideBoundary = sortedLotBoundarySegments.ElementAt(2);
+            var frontBoundaryModelCrv = new ModelCurve(frontBoundary);
+            output.Model.AddElement(frontBoundaryModelCrv);
 
-            // Draw side and rear setback envelope at origin
+            // Draw lot centreline      
+            var lotCentreLine = new Line(frontBoundary.PointAt(0.5), backBoundary.PointAt(0.5));
+            var centreModelLine = new ModelCurve(lotCentreLine);
+            output.Model.AddElement(centreModelLine);
+
+            // Draw in XY plane envelope at origin
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
             double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
             List<Vector3> envelopePtList = new List<Vector3>();
@@ -65,13 +70,9 @@ namespace VicGovResiEnvelope
             var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(planningEnvelopeModelCurves);
 
-
-            // Create envelope 
+            // Create envelope geom representation
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
-
-            var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, setback, Vector3.ZAxis, false);
             var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 0, 0, 0, false);
-            var geomRep = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
             var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { sweep });
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
@@ -79,14 +80,6 @@ namespace VicGovResiEnvelope
               new Envelope(envelopeProfile, 0, 50, Vector3.ZAxis, 0.0, new Transform(0,0,0), envMatl, geomRep2, false, Guid.NewGuid(),"")
             };
             output.Model.AddElements(envelopes);
-            var sideRearSetbackModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
-            output.Model.AddElements(sideRearSetbackModelCurves);
-            var modelCurves = perimeter.Select(i => new ModelCurve(i));
-            output.Model.AddElements(modelCurves);
-
-            // Outputs
-            output.Model.AddElement(centreModelLine);
-
             return output;
         }
 
