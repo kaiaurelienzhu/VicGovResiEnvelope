@@ -67,13 +67,15 @@ namespace VicGovResiEnvelope
             envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, maxHeight));
             envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, 0.0));
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
+            planningEnvelopePolgyon.Transform(new Transform(sideBoundary1.TransformAt(0.0)));
             var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(planningEnvelopeModelCurves);
 
             // Create envelope geom representation
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 0, 0, 0, false);
-            var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { sweep });
+            var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, lotCentreLine.Length(), lotCentreLine.Direction(), false);
+            var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
             var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
             {
