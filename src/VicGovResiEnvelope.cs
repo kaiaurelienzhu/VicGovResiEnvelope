@@ -44,8 +44,8 @@ namespace VicGovResiEnvelope
             var centreModelLine = new ModelCurve(lotCentreLine);
 
             // Get lot data 
-            Vector3 frontLotClosestPt = Vector3.Origin; // Override with UI
-            var frontBoundary = sortedLotBoundarySegments.First();
+            Vector3 frontLotClosestPt = input.FrontBoundary; // Override with UI
+            var frontBoundary = sortedLotBoundarySegments.OrderBy(s => s.PointAt(0.5).CompareTo(frontLotClosestPt)).First();
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
             var sideBoundary = sortedLotBoundarySegments.ElementAt(2);
