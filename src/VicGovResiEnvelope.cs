@@ -36,22 +36,23 @@ namespace VicGovResiEnvelope
             // Create lotBoundary as Curve object
             var lotBoundaryCurveLoop = GetPolylineFromSegments(lotBoundarySegments);
 
-            // Get front lot edge and render to Hypar
+            // Get front & back lot edge and render to Hypar
             Vector3 frontLotClosestPt = input.FrontBoundary; // Override with UI
-            var sortedLotBoundarySegments = lotBoundarySegments.OrderBy(s => s.PointAt(0.5).DistanceTo(frontLotClosestPt));
-            List<Vector3> midPoints = sortedLotBoundarySegments.Select(i => i.PointAt(0.5)).ToList();
-            var frontBoundary = sortedLotBoundarySegments.First();
-            var sideBoundary1 = sortedLotBoundarySegments.ElementAt(1);
-            var sideBoundary2 = sortedLotBoundarySegments.ElementAt(2);
-            var backBoundary = sortedLotBoundarySegments.Last();
+            Vector3 rearLotClosestPt = input.RearBoundary;
+            var frontBoundary = curveClosestPt(lotBoundarySegments, frontLotClosestPt);
+            var rearBoundary = curveClosestPt(lotBoundarySegments, rearLotClosestPt);
+            var sideBoundary = lotBoundarySegments.ElementAt(1);
+
+            //var sideBoundary1 = sortedLotBoundarySegments.ElementAt(1);
+            //var sideBoundary2 = sortedLotBoundarySegments.ElementAt(2);
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
-            var sideBoundary = sortedLotBoundarySegments.ElementAt(2);
             var frontBoundaryModelCrv = new ModelCurve(frontBoundary);
+            var rearBoundaryModelCrv = new ModelCurve(rearBoundary);
             output.Model.AddElement(frontBoundaryModelCrv);
 
             // Draw lot centreline      
-            var lotCentreLine = new Line(frontBoundary.PointAt(0.5), backBoundary.PointAt(0.5));
+            var lotCentreLine = new Line(frontBoundary.PointAt(0.5), rearBoundary.PointAt(0.5));
             var centreModelLine = new ModelCurve(lotCentreLine);
             output.Model.AddElement(centreModelLine);
 
@@ -60,16 +61,24 @@ namespace VicGovResiEnvelope
             double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
             List<Vector3> envelopePtList = new List<Vector3>();
             envelopePtList.Add(Vector3.Origin);
-            envelopePtList.Add(new Vector3(0*-1, 3.6));
-            envelopePtList.Add(new Vector3(1*-1, 3.6));
-            envelopePtList.Add(new Vector3(2*-1, 6.9));
-            envelopePtList.Add(new Vector3((thirdStoreyXcoordinate + 2)*-1, maxHeight));
-            envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, maxHeight));
-            envelopePtList.Add(new Vector3((frontBoundaryLengthHalved + thirdStoreyXcoordinate)*-1, 0.0));
+            envelopePtList.Add(new Vector3(0, 3.6));
+            envelopePtList.Add(new Vector3(1, 3.6));
+            envelopePtList.Add(new Vector3(2, 6.9));
+            envelopePtList.Add(new Vector3((thirdStoreyXcoordinate + 2), maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 0.0));
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
-            planningEnvelopePolgyon.Transform(new Transform(sideBoundary1.TransformAt(0.0)));
+            planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
             var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+            var mirrorYaxisMatrix = new Matrix(Vector3.XAxis*-1, Vector3.YAxis, Vector3.ZAxis, Vector3.Origin);
+            planningEnvelopePolgyon.Transform(new Transform(mirrorYaxisMatrix));
+            var planningEnvelopeModelCurvesXformed = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+            
+            planningEnvelopePolgyon.Transform(new Transform(lotCentreLine.TransformAt(0)));
+
             output.Model.AddElements(planningEnvelopeModelCurves);
+            output.Model.AddElements(planningEnvelopeModelCurvesXformed);
+
 
             // Create envelope geom representation
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
@@ -83,6 +92,13 @@ namespace VicGovResiEnvelope
             };
             output.Model.AddElements(envelopes);
             return output;
+        }
+
+        private static Line curveClosestPt(List<Line> lineSegments, Vector3 closestPt)
+        {
+            var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
+            var closestCrv = sortedLineSegments.First();
+            return closestCrv;
         }
 
 

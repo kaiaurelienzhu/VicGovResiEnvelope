@@ -28,17 +28,18 @@ namespace VicGovResiEnvelope
     {
         [Newtonsoft.Json.JsonConstructor]
         
-        public VicGovResiEnvelopeInputs(Vector3 @frontBoundary, double @proposedBuildingHeights, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
+        public VicGovResiEnvelopeInputs(Vector3 @frontBoundary, double @proposedBuildingHeights, Vector3 @rearBoundary, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
         base(bucketName, uploadsBucket, modelInputKeys, gltfKey, elementsKey, ifcKey)
         {
             var validator = Validator.Instance.GetFirstValidatorForType<VicGovResiEnvelopeInputs>();
             if(validator != null)
             {
-                validator.PreConstruct(new object[]{ @frontBoundary, @proposedBuildingHeights});
+                validator.PreConstruct(new object[]{ @frontBoundary, @proposedBuildingHeights, @rearBoundary});
             }
         
             this.FrontBoundary = @frontBoundary;
             this.ProposedBuildingHeights = @proposedBuildingHeights;
+            this.RearBoundary = @rearBoundary;
         
             if(validator != null)
             {
@@ -53,6 +54,10 @@ namespace VicGovResiEnvelope
         [Newtonsoft.Json.JsonProperty("Proposed Building Heights", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Range(3.6D, 11D)]
         public double ProposedBuildingHeights { get; set; } = 3.6D;
+    
+        /// <summary>A point which will be used to select the nearest boundary edge</summary>
+        [Newtonsoft.Json.JsonProperty("Rear Boundary", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
+        public Vector3 RearBoundary { get; set; }
     
     
     }

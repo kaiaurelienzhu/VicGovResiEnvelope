@@ -30,6 +30,13 @@
         "$hyparUnitType": "length",
         "$hyparOrder": 0,
         "minimum": 3.6
+      },
+      "Rear Boundary": {
+        "description": "A point which will be used to select the nearest boundary edge",
+        "default": null,
+        "type": "object",
+        "$hyparOrder": 2,
+        "$ref": "https://hypar.io/Schemas/Geometry/Vector3.json"
       }
     }
   },
