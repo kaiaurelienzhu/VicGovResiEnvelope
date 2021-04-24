@@ -69,11 +69,20 @@ namespace VicGovResiEnvelope
             envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 0.0));
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
             planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
-            var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+
+
+            // Mirror envelope
             var mirrorYaxisMatrix = new Matrix(Vector3.XAxis*-1, Vector3.YAxis, Vector3.ZAxis, Vector3.Origin);
-            planningEnvelopePolgyon.Transform(new Transform(mirrorYaxisMatrix));
-            var planningEnvelopeModelCurvesXformed = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+            var mirroredPolygon = planningEnvelopePolgyon.TransformedPolygon(new Transform(mirrorYaxisMatrix));
+            var planningEnvelopeModelCurvesXformed = mirroredPolygon.Segments().Select(i => new ModelCurve(i));
+            var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+
+            // Join envelopes
+            //Polygon mergedProfiles = mergeProfiles(planningEnvelopePolgyon, mirroredPolygon);
+            //var mergedProfilesModelCurves = mergedProfiles.Segments().Select(i => new ModelCurve(i));
+            //output.Model.AddElements(mergedProfilesModelCurves);
             
+            // Orient to lot centreline
             planningEnvelopePolgyon.Transform(new Transform(lotCentreLine.TransformAt(0)));
 
             output.Model.AddElements(planningEnvelopeModelCurves);
@@ -92,6 +101,20 @@ namespace VicGovResiEnvelope
             };
             output.Model.AddElements(envelopes);
             return output;
+        }
+
+        private static Polygon mergeProfiles(Polygon planningEnvelopePolgyon, Polygon mirroredPolygon)
+        {
+
+            var vertices = planningEnvelopePolgyon.Vertices; 
+            var mirroredVertices = mirroredPolygon.Vertices;
+            vertices.RemoveAt(vertices.Count-1);
+            vertices.RemoveAt(vertices.Count-1);
+            mirroredVertices.RemoveAt(mirroredVertices.Count-1);
+            mirroredVertices.RemoveAt(mirroredVertices.Count-1);
+            var pointList = vertices.Concat(mirroredVertices).ToList();
+            Polygon poly = new Polygon(pointList);
+            return poly;
         }
 
         private static Line curveClosestPt(List<Line> lineSegments, Vector3 closestPt)
