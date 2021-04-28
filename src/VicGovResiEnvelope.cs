@@ -39,38 +39,22 @@ namespace VicGovResiEnvelope
             // Get front & back lot edge and render to Hypar
             Vector3 frontLotClosestPt = input.FrontBoundary;
             Vector3 rearLotClosestPt = input.RearBoundary;
-            var frontBoundary = curveClosestPt(lotBoundarySegments, frontLotClosestPt);
-            var rearBoundary = curveClosestPt(lotBoundarySegments, rearLotClosestPt);
+            var frontBoundary = CurveClosestPt(lotBoundarySegments, frontLotClosestPt);
+            var rearBoundary = CurveClosestPt(lotBoundarySegments, rearLotClosestPt);
             var sideBoundary = lotBoundarySegments.ElementAt(1);
-
-
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
-            var frontBoundaryModelCrv = new ModelCurve(frontBoundary);
-            var rearBoundaryModelCrv = new ModelCurve(rearBoundary);
-            output.Model.AddElement(frontBoundaryModelCrv);
 
             // Draw lot centreline      
             var lotCentreLine = new Line(frontBoundary.PointAt(0.5), rearBoundary.PointAt(0.5));
-            var centreModelLine = new ModelCurve(lotCentreLine);
-            output.Model.AddElement(centreModelLine);
 
             // Create planning Envelope Polygon
-            var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.ProposedBuildingHeights, frontBoundaryLengthHalved);
-            planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
-
-            // Mirror envelope
-            var mirrorYaxisMatrix = new Matrix(Vector3.XAxis*-1, Vector3.YAxis, Vector3.ZAxis, Vector3.Origin);
-            var mirroredPolygon = planningEnvelopePolgyon.TransformedPolygon(new Transform(mirrorYaxisMatrix));
-            var planningEnvelopeModelCurvesXformed = mirroredPolygon.Segments().Select(i => new ModelCurve(i));
+            var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.ProposedBuildingHeights, frontBoundaryLengthHalved).First();
             var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
+            output.Model.AddElements(planningEnvelopeModelCurves);
             
             // Orient to lot centreline
             planningEnvelopePolgyon.Transform(new Transform(lotCentreLine.TransformAt(0)));
-
-            output.Model.AddElements(planningEnvelopeModelCurves);
-            output.Model.AddElements(planningEnvelopeModelCurvesXformed);
-
 
             // Create envelope geom representation
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
@@ -86,28 +70,14 @@ namespace VicGovResiEnvelope
             return output;
         }
 
-        public static Polygon mergeProfiles(Polygon planningEnvelopePolgyon, Polygon mirroredPolygon)
-        {
-
-            var vertices = planningEnvelopePolgyon.Vertices; 
-            var mirroredVertices = mirroredPolygon.Vertices;
-            vertices.RemoveAt(vertices.Count-1);
-            vertices.RemoveAt(vertices.Count-1);
-            mirroredVertices.RemoveAt(mirroredVertices.Count-1);
-            mirroredVertices.RemoveAt(mirroredVertices.Count-1);
-            var pointList = vertices.Concat(mirroredVertices).ToList();
-            Polygon poly = new Polygon(pointList);
-            return poly;
-        }
-
-        public static Line curveClosestPt(List<Line> lineSegments, Vector3 closestPt)
+        public static Line CurveClosestPt(List<Line> lineSegments, Vector3 closestPt)
         {
             var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
             var closestCrv = sortedLineSegments.First();
             return closestCrv;
         }
 
-        private static Polygon CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
+        public static List<Polygon> CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
         {
             double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
             double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
@@ -120,7 +90,16 @@ namespace VicGovResiEnvelope
             envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, maxHeight));
             envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 0.0));
             var planningEnvelopePolgyon = new Polygon(envelopePtList);
-            return planningEnvelopePolgyon;
+            
+            planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
+            var mirrorYaxisMatrix = new Matrix(Vector3.XAxis*-1, Vector3.YAxis, Vector3.ZAxis, Vector3.Origin);
+            var mirroredPolygon = planningEnvelopePolgyon.TransformedPolygon(new Transform(mirrorYaxisMatrix));
+
+            List<Polygon> polyList = new List<Polygon>();
+            polyList.Add(planningEnvelopePolgyon);
+            polyList.Add(mirroredPolygon);
+            var poly = Polygon.UnionAll(polyList, Vector3.EPSILON) as List<Polygon>;
+            return poly;
         }
 
         // Table 1 - Side and rear boundary setbacks table
