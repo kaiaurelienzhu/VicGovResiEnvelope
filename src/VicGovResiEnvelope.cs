@@ -37,14 +37,13 @@ namespace VicGovResiEnvelope
             var lotBoundaryCurveLoop = CreatePolylineFromLineSegments(lotBoundarySegments);
 
             // Get front & back lot edge and render to Hypar
-            Vector3 frontLotClosestPt = input.FrontBoundary; // Override with UI
+            Vector3 frontLotClosestPt = input.FrontBoundary;
             Vector3 rearLotClosestPt = input.RearBoundary;
             var frontBoundary = curveClosestPt(lotBoundarySegments, frontLotClosestPt);
             var rearBoundary = curveClosestPt(lotBoundarySegments, rearLotClosestPt);
             var sideBoundary = lotBoundarySegments.ElementAt(1);
 
-            //var sideBoundary1 = sortedLotBoundarySegments.ElementAt(1);
-            //var sideBoundary2 = sortedLotBoundarySegments.ElementAt(2);
+
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength / 2;
             var frontBoundaryModelCrv = new ModelCurve(frontBoundary);
