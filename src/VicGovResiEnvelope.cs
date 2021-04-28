@@ -57,17 +57,8 @@ namespace VicGovResiEnvelope
             output.Model.AddElement(centreModelLine);
 
             // Draw in XY plane envelope at origin
-            double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
-            double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
-            List<Vector3> envelopePtList = new List<Vector3>();
-            envelopePtList.Add(Vector3.Origin);
-            envelopePtList.Add(new Vector3(0, 3.6));
-            envelopePtList.Add(new Vector3(1, 3.6));
-            envelopePtList.Add(new Vector3(2, 6.9));
-            envelopePtList.Add(new Vector3((thirdStoreyXcoordinate + 2), maxHeight));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, maxHeight));
-            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 0.0));
-            var planningEnvelopePolgyon = new Polygon(envelopePtList);
+            var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.proposedBuildingHeights, maxHeight);
+
             planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
 
 
@@ -103,7 +94,7 @@ namespace VicGovResiEnvelope
             return output;
         }
 
-        private static Polygon mergeProfiles(Polygon planningEnvelopePolgyon, Polygon mirroredPolygon)
+        public static Polygon mergeProfiles(Polygon planningEnvelopePolgyon, Polygon mirroredPolygon)
         {
 
             var vertices = planningEnvelopePolgyon.Vertices; 
@@ -117,13 +108,28 @@ namespace VicGovResiEnvelope
             return poly;
         }
 
-        private static Line curveClosestPt(List<Line> lineSegments, Vector3 closestPt)
+        public static Line curveClosestPt(List<Line> lineSegments, Vector3 closestPt)
         {
             var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
             var closestCrv = sortedLineSegments.First();
             return closestCrv;
         }
 
+        private static Polygon CreatePlanningEnvelopePolygon(proposedBuildingHeight, maxHeight)
+        {
+            double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
+            double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
+            List<Vector3> envelopePtList = new List<Vector3>();
+            envelopePtList.Add(Vector3.Origin);
+            envelopePtList.Add(new Vector3(0, 3.6));
+            envelopePtList.Add(new Vector3(1, 3.6));
+            envelopePtList.Add(new Vector3(2, 6.9));
+            envelopePtList.Add(new Vector3((thirdStoreyXcoordinate + 2), maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, maxHeight));
+            envelopePtList.Add(new Vector3(frontBoundaryLengthHalved, 0.0));
+            var planningEnvelopePolgyon = new Polygon(envelopePtList);
+            return planningEnvelopePolgyon;
+        }
 
         // Table 1 - Side and rear boundary setbacks table
         public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
