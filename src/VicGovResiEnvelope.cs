@@ -34,7 +34,7 @@ namespace VicGovResiEnvelope
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
 
             // Create lotBoundary as Curve object
-            var lotBoundaryCurveLoop = GetPolylineFromSegments(lotBoundarySegments);
+            var lotBoundaryCurveLoop = CreatePolylineFromLineSegments(lotBoundarySegments);
 
             // Get front & back lot edge and render to Hypar
             Vector3 frontLotClosestPt = input.FrontBoundary; // Override with UI
@@ -57,7 +57,7 @@ namespace VicGovResiEnvelope
             output.Model.AddElement(centreModelLine);
 
             // Create planning Envelope Polygon
-            var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.proposedBuildingHeights, maxHeight);
+            var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.ProposedBuildingHeights, frontBoundaryLengthHalved);
             planningEnvelopePolgyon.Transform(new Transform(new Vector3(frontBoundaryLengthHalved*-1, 0, 0), 0));
 
             // Mirror envelope
@@ -108,7 +108,7 @@ namespace VicGovResiEnvelope
             return closestCrv;
         }
 
-        private static Polygon CreatePlanningEnvelopePolygon(proposedBuildingHeight, maxHeight)
+        private static Polygon CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
         {
             double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
             double thirdStoreyXcoordinate = GetThirdStoreyXcoordinate(maxHeight);
@@ -165,7 +165,7 @@ namespace VicGovResiEnvelope
           return 3.1;
         }
 
-        public static Polyline GetPolylineFromSegments(IList<Line> lineSegments)
+        public static Polyline CreatePolylineFromLineSegments(IList<Line> lineSegments)
         {
           List<Vector3> points = new List<Vector3>();
           foreach (Line seg in lineSegments)
