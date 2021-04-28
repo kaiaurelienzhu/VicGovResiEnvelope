@@ -53,18 +53,18 @@ namespace VicGovResiEnvelope
             var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
             output.Model.AddElements(planningEnvelopeModelCurves);
             
-            // Orient to lot centreline
+            // Orient envelope to lot centreline
             planningEnvelopePolgyon.Transform(new Transform(lotCentreLine.TransformAt(0)));
 
             // Create envelope geom representation
             var envelopeProfile = new Profile(planningEnvelopePolgyon);
             var sweep = new Elements.Geometry.Solids.Sweep(envelopeProfile, lotBoundaryCurveLoop, 0, 0, 0, false);
             var extrude = new Elements.Geometry.Solids.Extrude(envelopeProfile, lotCentreLine.Length(), lotCentreLine.Direction(), false);
-            var geomRep2 = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
-            var envMatl = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
+            var geometryRepresentation = new Representation(new List<Elements.Geometry.Solids.SolidOperation>() { extrude });
+            var envelopeMaterial = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
             {
-              new Envelope(envelopeProfile, 0, 50, Vector3.ZAxis, 0.0, new Transform(0,0,0), envMatl, geomRep2, false, Guid.NewGuid(),"")
+              new Envelope(envelopeProfile, 0, 50, Vector3.ZAxis, 0.0, new Transform(0,0,0), envelopeMaterial, geometryRepresentation, false, Guid.NewGuid(),"")
             };
             output.Model.AddElements(envelopes);
             return output;
@@ -102,7 +102,6 @@ namespace VicGovResiEnvelope
             return poly;
         }
 
-        // Table 1 - Side and rear boundary setbacks table
         public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
 
         {
