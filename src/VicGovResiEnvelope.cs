@@ -25,6 +25,7 @@ namespace VicGovResiEnvelope
 
             // Get Setback
             double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeights);
+            double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
             var output = new VicGovResiEnvelopeOutputs(setback);
 
             // Boundary & sort
@@ -64,7 +65,7 @@ namespace VicGovResiEnvelope
             var envelopeMaterial = new Material("envelope", new Color(0.3, 0.7, 0.7, 0.6), 0.0f, 0.0f);
             var envelopes = new List<Envelope>()
             {
-              new Envelope(envelopeProfile, 0, 50, Vector3.ZAxis, 0.0, new Transform(0,0,0), envelopeMaterial, geometryRepresentation, false, Guid.NewGuid(),"")
+              new Envelope(envelopeProfile, 0, maxHeight, lotCentreLine.Direction(), 0.0, new Transform(0,0,0), envelopeMaterial, geometryRepresentation, false, Guid.NewGuid(),"")
             };
             output.Model.AddElements(envelopes);
             return output;
