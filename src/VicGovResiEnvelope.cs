@@ -21,10 +21,11 @@ namespace VicGovResiEnvelope
 
             // Get site model dependency
             var siteModel = inputModels["Site"];
-            var siteElement = siteModel.AllElementsOfType<Site>().First();
+            var siteElement = getSite(siteModel);
 
             // Get Setback
             double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeights);
+
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
             var output = new VicGovResiEnvelopeOutputs(setback);
 
@@ -44,7 +45,7 @@ namespace VicGovResiEnvelope
             var rearBoundary = CurveClosestPt(lotBoundarySegments, rearLotClosestPt);
             var sideBoundary = lotBoundarySegments.ElementAt(1);
             var frontBoundaryLength = frontBoundary.Length();
-            var frontBoundaryLengthHalved = frontBoundaryLength / 2;
+            var frontBoundaryLengthHalved = frontBoundaryLength/2;
 
             // Draw lot centreline      
             var lotCentreLine = new Line(frontBoundary.PointAt(0.5), rearBoundary.PointAt(0.5));
@@ -151,6 +152,29 @@ namespace VicGovResiEnvelope
             points.Add(seg.PointAt(0.0));
           }
           return new Polyline(points);
+        }
+
+        // Grab the biggest site's bounding box from the model
+        private static Site getSite(Model model)
+        {
+            var sites = getElementsOfType<Site>(model);
+            if (sites == null)
+            {
+                return null;
+            }
+            sites = sites.OrderByDescending(e => e.Perimeter.Area()).ToList();
+            var site = sites[0];
+            return site;
+        }
+        private static List<T> getElementsOfType<T>(Model model)
+        {
+            if (model == null)
+            {
+                return null;
+            }
+            var items = new List<T>();
+            items.AddRange(model.AllElementsOfType<T>());
+            return items;
         }
       }
 }
