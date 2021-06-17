@@ -72,13 +72,6 @@ namespace VicGovResiEnvelope
             return output;
         }
 
-        public static Line CurveClosestPt(List<Line> lineSegments, Vector3 closestPt)
-        {
-            var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
-            var closestCrv = sortedLineSegments.First();
-            return closestCrv;
-        }
-
         public static List<Polygon> CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
         {
             double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
@@ -103,7 +96,6 @@ namespace VicGovResiEnvelope
             var poly = Polygon.UnionAll(polyList, Vector3.EPSILON) as List<Polygon>;
             return poly;
         }
-
         public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
 
         {
@@ -143,7 +135,6 @@ namespace VicGovResiEnvelope
           // Default output
           return 3.1;
         }
-
         public static Polyline CreatePolylineFromLineSegments(IList<Line> lineSegments)
         {
           List<Vector3> points = new List<Vector3>();
@@ -154,6 +145,12 @@ namespace VicGovResiEnvelope
           return new Polyline(points);
         }
 
+        public static Line CurveClosestPt(List<Line> lineSegments, Vector3 closestPt)
+        {
+            var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
+            var closestCrv = sortedLineSegments.First();
+            return closestCrv;
+        }
         // Grab the biggest site's bounding box from the model
         private static Site getSite(Model model)
         {
