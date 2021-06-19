@@ -28,19 +28,18 @@ namespace VicGovResiEnvelope
     {
         [Newtonsoft.Json.JsonConstructor]
         
-        public VicGovResiEnvelopeInputs(VicGovResiEnvelopeInputsBuildingFacing @buildingFacing, Vector3 @frontBoundary, VicGovResiEnvelopeInputsAllotmentDesignation @allotmentDesignation, Vector3 @rearBoundary, double @proposedBuildingHeights, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
+        public VicGovResiEnvelopeInputs(VicGovResiEnvelopeInputsBuildingFacing @buildingFacing, Vector3 @frontBoundary, VicGovResiEnvelopeInputsAllotmentDesignation @allotmentDesignation, double @proposedBuildingHeights, string bucketName, string uploadsBucket, Dictionary<string, string> modelInputKeys, string gltfKey, string elementsKey, string ifcKey):
         base(bucketName, uploadsBucket, modelInputKeys, gltfKey, elementsKey, ifcKey)
         {
             var validator = Validator.Instance.GetFirstValidatorForType<VicGovResiEnvelopeInputs>();
             if(validator != null)
             {
-                validator.PreConstruct(new object[]{ @buildingFacing, @frontBoundary, @allotmentDesignation, @rearBoundary, @proposedBuildingHeights});
+                validator.PreConstruct(new object[]{ @buildingFacing, @frontBoundary, @allotmentDesignation, @proposedBuildingHeights});
             }
         
             this.BuildingFacing = @buildingFacing;
             this.FrontBoundary = @frontBoundary;
             this.AllotmentDesignation = @allotmentDesignation;
-            this.RearBoundary = @rearBoundary;
             this.ProposedBuildingHeights = @proposedBuildingHeights;
         
             if(validator != null)
@@ -62,10 +61,6 @@ namespace VicGovResiEnvelope
         [Newtonsoft.Json.JsonProperty("Allotment designation", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [Newtonsoft.Json.JsonConverter(typeof(Newtonsoft.Json.Converters.StringEnumConverter))]
         public VicGovResiEnvelopeInputsAllotmentDesignation AllotmentDesignation { get; set; } = VicGovResiEnvelopeInputsAllotmentDesignation.Type_A;
-    
-        /// <summary>A point which will be used to select the nearest boundary edge</summary>
-        [Newtonsoft.Json.JsonProperty("Rear Boundary", Required = Newtonsoft.Json.Required.Default, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
-        public Vector3 RearBoundary { get; set; }
     
         [Newtonsoft.Json.JsonProperty("Proposed Building Heights", Required = Newtonsoft.Json.Required.DisallowNull, NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore)]
         [System.ComponentModel.DataAnnotations.Range(3.6D, 11D)]

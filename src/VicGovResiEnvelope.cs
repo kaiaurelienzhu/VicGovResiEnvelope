@@ -44,9 +44,8 @@ namespace VicGovResiEnvelope
 
             // Get front & back lot edge and render to Hypar
             Vector3 frontLotClosestPt = input.FrontBoundary;
-            Vector3 rearLotClosestPt = input.RearBoundary;
             var frontBoundary = CurveClosestPt(lotBoundarySegments, frontLotClosestPt);
-            var rearBoundary = CurveClosestPt(lotBoundarySegments, rearLotClosestPt);
+            var rearBoundary = CurveFurthestPt(lotBoundarySegments, frontLotClosestPt);
             var sideBoundary = lotBoundarySegments.ElementAt(1);
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength/2;
@@ -99,6 +98,7 @@ namespace VicGovResiEnvelope
                 return 3.0 - sideSetback;
               } 
             }
+
             else if (allotmentType == "Type _B")
             {
               if (facingCondition == "Road")
@@ -111,6 +111,7 @@ namespace VicGovResiEnvelope
                 return 1.5 - sideSetback;
               }
             }
+
             // Default output
             return 4.0 - sideSetback;
         }
@@ -189,6 +190,14 @@ namespace VicGovResiEnvelope
             var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
             var closestCrv = sortedLineSegments.First();
             return closestCrv;
+        }
+
+        public static Line CurveFurthestPt(List<Line> lineSegments, Vector3 closestPt)
+        {
+            var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
+            var reversed = sortedLineSegments.Reverse();
+            var furthestCrv = reversed.First();
+            return furthestCrv;
         }
         private static Site getSite(Model model)
         {

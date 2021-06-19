@@ -19,7 +19,7 @@
         "description": "Building facing condition (declared road or recreation reserve on the other side of the street and opposite the allotment)",
         "default": "Other",
         "type": "string",
-        "$hyparOrder": 4,
+        "$hyparOrder": 3,
         "enum": [
           "Road",
           "Reserve",
@@ -37,18 +37,11 @@
         "description": "Designation of the allotment in the subdivision permit",
         "default": "Type A",
         "type": "string",
-        "$hyparOrder": 3,
+        "$hyparOrder": 2,
         "enum": [
           "Type A",
           "Type B"
         ]
-      },
-      "Rear Boundary": {
-        "description": "A point which will be used to select the nearest boundary edge",
-        "default": null,
-        "type": "object",
-        "$hyparOrder": 2,
-        "$ref": "https://hypar.io/Schemas/Geometry/Vector3.json"
       },
       "Proposed Building Heights": {
         "multipleOf": 0.1,
@@ -77,5 +70,5 @@
   "source_file_key": null,
   "preview_image": null,
   "thumbnail_id": "edb56a29-e478-446b-bf46-97764addd03f",
-  "last_updated": "2021-06-19T00:42:05.727163"
+  "last_updated": "2021-06-19T01:00:32.76831"
 }
