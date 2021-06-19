@@ -25,8 +25,8 @@ namespace VicGovResiEnvelope
 
             // Get Setback
             double sideSetback = GetSideSetbackFromBldgHeight(input.ProposedBuildingHeights);
-            string allotmentType = "A";
-            string facingCondition = "other";
+            string allotmentType = input.AllotmentDesignation.ToString();
+            string facingCondition = input.BuildingFacing.ToString();
             bool isCorner = false;
 
             double frontSetback = GetFrontSetback(allotmentType, facingCondition, isCorner, sideSetback);
@@ -82,10 +82,38 @@ namespace VicGovResiEnvelope
 
         private static double GetFrontSetback(string allotmentType, string facingCondition, bool isCorner, double sideSetback)
         {
-            return 3.0 - sideSetback;
-        }
+            if (allotmentType == "Type_A")
+            {
+              if (facingCondition == "Road")
+              {
+                return 4.0 - sideSetback;
+              }
 
-        // Create planning envelope
+              else if (facingCondition == "Reserve")
+              {
+                return 1.5 - sideSetback;
+              }
+
+              else if (facingCondition == "Other")
+              {
+                return 3.0 - sideSetback;
+              } 
+            }
+            else if (allotmentType == "Type _B")
+            {
+              if (facingCondition == "Road")
+              {
+                return 4.0 - sideSetback;
+              }
+
+              else
+              {
+                return 1.5 - sideSetback;
+              }
+            }
+            // Default output
+            return 4.0 - sideSetback;
+        }
         public static List<Polygon> CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
         {
             double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
@@ -125,7 +153,6 @@ namespace VicGovResiEnvelope
           // Default output
           return 1;
         }
-     
         public static double GetMaxHeightAllowance(double proposedBuildingHeight)
         {
           if (proposedBuildingHeight > 10.0)
@@ -135,7 +162,6 @@ namespace VicGovResiEnvelope
           // Default output
           return 10.0;
         }
-
         public static double GetThirdStoreyXcoordinate(double maxHeightAllowance)
         {
           if (maxHeightAllowance == 10.0)
@@ -158,14 +184,12 @@ namespace VicGovResiEnvelope
           }
           return new Polyline(points);
         }
-
         public static Line CurveClosestPt(List<Line> lineSegments, Vector3 closestPt)
         {
             var sortedLineSegments = lineSegments.OrderBy(s => s.PointAt(0.5).DistanceTo(closestPt));
             var closestCrv = sortedLineSegments.First();
             return closestCrv;
         }
-        // Grab the biggest site's bounding box from the model
         private static Site getSite(Model model)
         {
             var sites = getElementsOfType<Site>(model);
