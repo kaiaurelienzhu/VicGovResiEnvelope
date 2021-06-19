@@ -25,7 +25,11 @@ namespace VicGovResiEnvelope
 
             // Get Setback
             double sideSetback = GetSideSetbackFromBldgHeight(input.ProposedBuildingHeights);
+            string allotmentType = "A";
+            string facingCondition = "other";
+            bool isCorner = false;
 
+            double frontSetback = GetFrontSetback(allotmentType, facingCondition, isCorner, sideSetback);
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
             var output = new VicGovResiEnvelopeOutputs(sideSetback);
 
@@ -47,13 +51,17 @@ namespace VicGovResiEnvelope
             var frontBoundaryLength = frontBoundary.Length();
             var frontBoundaryLengthHalved = frontBoundaryLength/2;
 
+            // Create front offset
+            var translationVec =  rearBoundary.PointAt(0.5) - frontBoundary.PointAt(0.5);
+            var unitTranslationVec = translationVec.Unitized();
+            var frontSetbackTranslationVector = unitTranslationVec * frontSetback;
+            var frontBoundaryXformed = frontBoundary.TransformedLine(new Transform(frontSetbackTranslationVector));
+
             // Draw lot centreline      
-            var lotCentreLine = new Line(frontBoundary.PointAt(0.5), rearBoundary.PointAt(0.5));
+            var lotCentreLine = new Line(frontBoundaryXformed.PointAt(0.5), rearBoundary.PointAt(0.5));
 
             // Create planning Envelope Polygon
             var planningEnvelopePolgyon = CreatePlanningEnvelopePolygon(input.ProposedBuildingHeights, frontBoundaryLengthHalved).First();
-            var planningEnvelopeModelCurves = planningEnvelopePolgyon.Segments().Select(i => new ModelCurve(i));
-            output.Model.AddElements(planningEnvelopeModelCurves);
             
             // Orient envelope to lot centreline
             planningEnvelopePolgyon.Transform(new Transform(lotCentreLine.TransformAt(0)));
@@ -70,6 +78,11 @@ namespace VicGovResiEnvelope
             };
             output.Model.AddElements(envelopes);
             return output;
+        }
+
+        private static double GetFrontSetback(string allotmentType, string facingCondition, bool isCorner, double sideSetback)
+        {
+            return 3.0 - sideSetback;
         }
 
         // Create planning envelope
