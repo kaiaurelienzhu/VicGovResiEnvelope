@@ -23,13 +23,11 @@ namespace VicGovResiEnvelope
             var siteModel = inputModels["Site"];
             var siteElement = getSite(siteModel);
 
-            // Get Setback
+            // Get Setbacks
             double sideSetback = GetSideSetbackFromBldgHeight(input.ProposedBuildingHeights);
             string allotmentType = input.AllotmentDesignation.ToString();
             string facingCondition = input.BuildingFacing.ToString();
-            bool isCorner = false;
-
-            double frontSetback = GetFrontSetback(allotmentType, facingCondition, isCorner, sideSetback);
+            double frontSetback = GetFrontSetback(allotmentType, facingCondition, sideSetback);
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
             var output = new VicGovResiEnvelopeOutputs(sideSetback);
 
@@ -79,7 +77,7 @@ namespace VicGovResiEnvelope
             return output;
         }
 
-        private static double GetFrontSetback(string allotmentType, string facingCondition, bool isCorner, double sideSetback)
+        private static double GetFrontSetback(string allotmentType, string facingCondition, double sideSetback)
         {
             if (allotmentType == "Type_A")
             {
