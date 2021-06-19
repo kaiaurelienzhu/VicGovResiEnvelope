@@ -24,13 +24,13 @@ namespace VicGovResiEnvelope
             var siteElement = getSite(siteModel);
 
             // Get Setback
-            double setback = GetSetBackFromBldgHeight(input.ProposedBuildingHeights);
+            double sideSetback = GetSideSetbackFromBldgHeight(input.ProposedBuildingHeights);
 
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
-            var output = new VicGovResiEnvelopeOutputs(setback);
+            var output = new VicGovResiEnvelopeOutputs(sideSetback);
 
             // Boundary & sort
-            var perimeter = siteElement.Perimeter.Offset(setback * -1);
+            var perimeter = siteElement.Perimeter.Offset(sideSetback * -1);
             var siteArea = siteElement.Area;
             var siteBoundaryProfile = new Profile(perimeter);
             List<Line> lotBoundarySegments = siteBoundaryProfile.Segments();
@@ -72,6 +72,7 @@ namespace VicGovResiEnvelope
             return output;
         }
 
+        // Create planning envelope
         public static List<Polygon> CreatePlanningEnvelopePolygon(double proposedBuildingHeight, double frontBoundaryLengthHalved)
         {
             double maxHeight = GetMaxHeightAllowance(proposedBuildingHeight);
@@ -96,7 +97,7 @@ namespace VicGovResiEnvelope
             var poly = Polygon.UnionAll(polyList, Vector3.EPSILON) as List<Polygon>;
             return poly;
         }
-        public static double GetSetBackFromBldgHeight(double proposedBuildingHeight)
+        public static double GetSideSetbackFromBldgHeight(double proposedBuildingHeight)
 
         {
           if (proposedBuildingHeight < 6.9)
