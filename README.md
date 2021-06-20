@@ -16,5 +16,6 @@ This function attempts to automate the Victorian Government (AUS) residential pl
 
 |Output Name|Type|Description|
 |---|---|---|
-|Required Setback|Number|The required setback from boundary derived from the proposed building height|
+|Side and rear setback|Number|The required side and rear setback from boundary derived from the proposed building height|
+|Front setback|Number|The front setback defined by the allotment type and front face condition|
 

@@ -17,10 +17,16 @@ namespace VicGovResiEnvelope
     public class VicGovResiEnvelopeOutputs: ResultsBase
     {
 		/// <summary>
-		/// The required setback from boundary derived from the proposed building height
+		/// The required side and rear setback from boundary derived from the proposed building height
 		/// </summary>
-		[JsonProperty("Required Setback")]
-		public double RequiredSetback {get;}
+		[JsonProperty("Side and rear setback")]
+		public double SideAndRearSetback {get;}
+
+		/// <summary>
+		/// The front setback defined by the allotment type and front face condition
+		/// </summary>
+		[JsonProperty("Front setback")]
+		public double FrontSetback {get;}
 
 
 
@@ -39,9 +45,10 @@ namespace VicGovResiEnvelope
         /// </summary>
         /// <returns></returns>
         [JsonConstructor]
-        public VicGovResiEnvelopeOutputs(double requiredSetback): base()
+        public VicGovResiEnvelopeOutputs(double sideAndRearSetback, double frontSetback): base()
         {
-			this.RequiredSetback = requiredSetback;
+			this.SideAndRearSetback = sideAndRearSetback;
+			this.FrontSetback = frontSetback;
 
 		}
 

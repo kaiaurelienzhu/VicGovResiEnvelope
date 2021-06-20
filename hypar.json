@@ -57,8 +57,14 @@
   "outputs": [
     {
       "unit_type": "length",
-      "name": "Required Setback",
-      "description": "The required setback from boundary derived from the proposed building height",
+      "name": "Side and rear setback",
+      "description": "The required side and rear setback from boundary derived from the proposed building height",
+      "type": "number"
+    },
+    {
+      "unit_type": "length",
+      "name": "Front setback",
+      "description": "The front setback defined by the allotment type and front face condition",
       "type": "number"
     }
   ],
@@ -70,5 +76,5 @@
   "source_file_key": null,
   "preview_image": null,
   "thumbnail_id": "edb56a29-e478-446b-bf46-97764addd03f",
-  "last_updated": "2021-06-19T01:00:32.76831"
+  "last_updated": "2021-06-20T01:29:01.161869"
 }

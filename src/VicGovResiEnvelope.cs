@@ -29,7 +29,8 @@ namespace VicGovResiEnvelope
             string facingCondition = input.BuildingFacing.ToString();
             double frontSetback = GetFrontSetback(allotmentType, facingCondition, sideSetback);
             double maxHeight = GetMaxHeightAllowance(input.ProposedBuildingHeights);
-            var output = new VicGovResiEnvelopeOutputs(sideSetback);
+            var output = new VicGovResiEnvelopeOutputs(sideSetback, frontSetback);
+
 
             // Boundary & sort
             var perimeter = siteElement.Perimeter.Offset(sideSetback * -1);
